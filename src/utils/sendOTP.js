@@ -56,3 +56,5 @@ const sendOTP = async (email, otp) => {
     console.error("❌ SendGrid error:", error.response ? error.response.body : error);
   }
 };
+
+export default sendOTP;
