@@ -15,5 +15,5 @@ export const verifyOTP=async(req,resp)=>{
     await User.updateOne({email},{isVerified:true}); // User ko verified mark kar rahe hain
     await OTP.deleteMany({email}); // OTP ko delete kar rahe hain verification ke baad
 
-    resp.json({msg:"User verified successfully. You can now login."});
+    resp.json({success:true, message:"User verified successfully."});
 }   
