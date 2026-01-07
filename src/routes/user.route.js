@@ -19,7 +19,7 @@
 
 
 import { Router } from "express";
-import { createUser, loginUser, checkAccess,logoutUser } from "../controllers/user.controller.js";
+import { createUser, loginUser, checkAccess,logoutUser, getProfile,updateProfile } from "../controllers/user.controller.js";
 import auth from "../middleware/auth.middleware.js";
 
 const userRouter = Router();
@@ -27,6 +27,8 @@ const userRouter = Router();
 userRouter.post("/register", createUser);
 userRouter.post("/login", loginUser);
 userRouter.post("/logout", auth, logoutUser);  // ✅ नया logout route
+userRouter.get("/profile",auth,getProfile);
+userRouter.put("/update-profile",auth,updateProfile);
 // Protected route to check access
 userRouter.get("/register-complaints-access", auth, checkAccess);
 

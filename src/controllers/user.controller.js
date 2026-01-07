@@ -28,7 +28,7 @@ resp.status(500).json({msg:"Logout Failed",error:error.message});
 /// Step 1---registration new user -> generate otp->send otp
 
 export const createUser=async(req,resp)=>{
-        const {username, email, password, gender, age}=req.body;
+        const {username, email, password, gender, age,mobile,address}=req.body;
         let user=await User.findOne({email}); // kya ye email already database me hai?
 
 if(user && user.isVerified){
@@ -37,7 +37,7 @@ if(user && user.isVerified){
 }
 if(!user){
   user=new User({
-    username,email,password,age,gender});
+    username,email,password,age,gender,mobile,address});
   await user.save(); //Naya user object create kar rahe hain
 }
 
@@ -71,20 +71,52 @@ export const loginUser = async (req, res) => {
 
   // generate JWT token
   const token = jwt.sign(
-    { userId: User._id, email: User.email },
+    { userId:user._id, email: user.email },
     process.env.JWT_SECRET,
     { expiresIn: "1h" }
   );
   res.json({ msg: "Login successful", token,
     user: {
-    name:User.username,
-    email:User.email,
-    age:User.age,
-    gender:User.gender
+    username:user.username,
+    email:user.email,
+    age:user.age,
+    gender:user.gender,
+    mobile: user.mobile,
+  address: user.address,
+  image: user.image
+
   }
   });
 
 };
+export const getProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId).select("-password -__v");
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const updateProfile = async (req, res) => {
+  try {
+    const { username, email, mobile, address, image,age,gender } = req.body;
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.userId,
+      { username, email, mobile, address, image,age,gender },
+      { new: true, runValidators: true }
+    ).select("-password -__v");
+
+    if (!updatedUser) return res.status(404).json({ message: "User not found" });
+
+    res.json(updatedUser);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 
 // Example protected route (to check login)
 export const checkAccess = async (req, res) => {

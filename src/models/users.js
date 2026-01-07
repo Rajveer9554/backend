@@ -4,17 +4,17 @@ import mongoose from "mongoose";
 
 // creating schema
 
-const userSchema=new mongoose.Schema({
-    username:{
-        type: String,
-        required:[true, "Name is required !"],
-        minLength:[3, "Atleast 3 character are required!"],
-        maxLength:[ 20, "Atmostt 20 character are required!"],
-        trim:true,
+const userSchema = new mongoose.Schema({
+  username: {
+    type: String,
+    required: [true, "Name is required !"],
+    minLength: [3, "Atleast 3 character are required!"],
+    maxLength: [20, "Atmostt 20 character are required!"],
+    trim: true,
 
-    },
+  },
 
-   email: {
+  email: {
     type: String,
     required: [true, "Email is required !"],
     match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Invalid Email [abc@gmail.com]!!"],
@@ -42,17 +42,36 @@ const userSchema=new mongoose.Schema({
       message: "Invalid gender by validator",
     },
   },
+  mobile: {
+    type: String,
+    
+    minLength: [10, "Mobile number must be 10 digit !"],
+    maxLength: [10, "Mobile number must be 10 digit !"],
+  },
+  address:{
+    type: String,
+    
+    minLength: [10, "Atleast 10 character are required!"],
+    maxLength: [100, "Atmostt 100 character are required!"],
+    trim: true,
+  },
+  image:{
+    type: String,
+    default:"",
+  },
   createdDate: {
     type: Date,
     default: Date.now,
   },
 
   // verification
-  isVerified:{
-    type:Boolean,
-    default:false,  // become true after otp verification
+  isVerified: {
+    type: Boolean,
+    default: false,  // become true after otp verification
   },
-});
+  
+},
+{timestamps: true});
 
 // //hashing password before saving..
 // userSchema.pre("save", async function (next) {
@@ -75,7 +94,7 @@ const userSchema=new mongoose.Schema({
 //   user.password = hashedPassword;
 //   next();
 // });
-   
+
 // Hash password before saving
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
