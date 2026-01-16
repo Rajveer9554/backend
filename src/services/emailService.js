@@ -1,12 +1,17 @@
 import fs from "fs";
 import sgMail from "../config/sendgrid.js";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 export const sendComplaintEmail = async (userEmail, authorityEmail, subject, pdfPath) => {
   const pdfBuffer = fs.readFileSync(pdfPath);
 
   const msg = {
     to: authorityEmail,
-    from: process.env.SENDER_EMAIL,
+    from: process.env.SENDGRID_SENDER,
     replyTo: userEmail,
     subject,
     text: "Please find attached complaint application.",
