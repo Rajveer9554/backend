@@ -1,11 +1,17 @@
 import Complaint from "../models/Complaint.js";
+import mongoose from "mongoose";
 import Authority from "../models/Authority.js";
 import { generateComplaintPDF } from "../services/pdfService.js";
 import { sendComplaintEmail } from "../services/emailService.js";
 
 export const sendComplaint = async (req, res, next) => {
   try {
-    const complaint = await Complaint.create(req.body);
+    // Ensure userId is stored as ObjectId
+    const complaint = await Complaint.create({
+      ...req.body,
+      userId: new mongoose.Types.ObjectId(req.body.userId),
+    });
+
 
     // Generate PDF
     const pdfPath = await generateComplaintPDF(complaint);
@@ -44,3 +50,54 @@ export const sendComplaint = async (req, res, next) => {
     next(err);
   }
 };
+
+// // ✅ Get complaint summary for a user
+// export const getUserComplaintSummary = async (req, res) => {
+//   try {
+//     const userId = req.params.userId;
+
+//     // Fetch all complaints of this user
+//     const complaints = await Complaint.find({ userId });
+
+//     // Count total complaints
+//     const totalComplaints = complaints.length;
+
+//     // Group by department
+//     const departmentCounts = complaints.reduce((acc, c) => {
+//       acc[c.department] = (acc[c.department] || 0) + 1;
+//       return acc;
+//     }, {});
+
+//     res.json({
+//       success: true,
+//       totalComplaints,
+//       departmentCounts,
+//       complaints,
+//     });
+//   } catch (err) {
+//     res.status(500).json({ success: false, message: err.message });
+//   }
+// };
+
+export const getUserComplaintSummary = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ success: false, message: "Invalid userId" });
+    }
+
+    const complaints = await Complaint.find({ userId: new mongoose.Types.ObjectId(userId) });
+
+    const totalComplaints = complaints.length;
+    const departmentCounts = complaints.reduce((acc, c) => {
+      acc[c.department] = (acc[c.department] || 0) + 1;
+      return acc;
+    }, {});
+
+    res.json({ success: true, totalComplaints, departmentCounts, complaints });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+

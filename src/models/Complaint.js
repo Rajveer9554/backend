@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 
 const complaintSchema = new mongoose.Schema({
+ userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+
   name: String,
   mobile: String,
   email: String,
@@ -12,8 +14,10 @@ const complaintSchema = new mongoose.Schema({
     lat: Number,
     lng: Number
   },
-  createdAt: { type: Date, default: Date.now }
-});
+
+  createdAt: { type: Date, default: Date.now },
+}, { timestamps: true }); // 👈 timestamps se createdAt + updatedAt dono milenge
+
 
 const Complaint = mongoose.model("Complaint", complaintSchema);
 export default Complaint;

@@ -6,7 +6,9 @@ import otpRouter from "./routes/otp.routes.js";
 import complaintRoutes from "./routes/complaintRoutes.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 
+
 import cors from"cors";
+import statsRouter from "./routes/stats.routes.js";
 dotenv.config({ path: "./.env" });
 
 
@@ -26,6 +28,7 @@ app.use(express.json({limit:"3mb"}));// allow base 64 json data
 app.use("/api", userRouter);
 app.use("/api/otp", otpRouter);
 app.use("/api/complaints",complaintRoutes);
+app.use("/api",statsRouter);
 app.use(errorHandler);
 
 
