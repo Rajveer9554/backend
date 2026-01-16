@@ -3,7 +3,8 @@ import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import userRouter from "./routes/user.route.js";
 import otpRouter from "./routes/otp.routes.js";
-
+import complaintRoutes from "./routes/complaintRoutes.js";
+import { errorHandler } from "./middleware/errorHandler.js";
 
 import cors from"cors";
 dotenv.config({ path: "./.env" });
@@ -18,12 +19,15 @@ app.use(cors({
             "https://awaze-e-janata.netlify.app"],
 }))
 
-app.use(express.json());
+app.use(express.json({limit:"3mb"}));// allow base 64 json data
 
 
 // routes
 app.use("/api", userRouter);
 app.use("/api/otp", otpRouter);
+app.use("/api/complaints",complaintRoutes);
+app.use(errorHandler);
+
 
 
 
