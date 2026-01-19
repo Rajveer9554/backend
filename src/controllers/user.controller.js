@@ -64,13 +64,13 @@ export const loginUser = async (req, res) => {
     return res.status(400).json({msg:"Please verify otp first."})
 
    // ✅ Compare hashed password
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(password, user.password); // password → plain text (login input) & user.password → hashed password from DB
     if (!isMatch)
       return res.status(400).json({ msg: "Invalid Password." });
 
 
   // generate JWT token
-  const token = jwt.sign(
+  const token = jwt.sign (
     { userId:user._id, email: user.email },
     process.env.JWT_SECRET,
     { expiresIn: "1h" }

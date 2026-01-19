@@ -96,9 +96,9 @@ const userSchema = new mongoose.Schema({
 // });
 
 // Hash password before saving
-userSchema.pre("save", async function (next) {
+userSchema.pre("save", async function (next) { //save se pehle run hone wala function
   if (!this.isModified("password")) return next();
-  const salt = await bcrypt.genSalt(10); // recommended salt rounds
+  const salt = await bcrypt.genSalt(10); // Random string & Hash ke sath mix hota hai
   this.password = await bcrypt.hash(this.password, salt);
   next();
 });

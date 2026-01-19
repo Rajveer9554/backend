@@ -4,7 +4,7 @@ import Authority from "../models/Authority.js";
 import { generateComplaintPDF } from "../services/pdfService.js";
 import { sendComplaintEmail } from "../services/emailService.js";
 
-export const sendComplaint = async (req, res, next) => {
+export const sendComplaint = async (req, res, next) => { 
   try {
     // Ensure userId is stored as ObjectId
     const complaint = await Complaint.create({
@@ -12,13 +12,13 @@ export const sendComplaint = async (req, res, next) => {
       userId: new mongoose.Types.ObjectId(req.body.userId),
     });
 
-
+1
     // Generate PDF
     const pdfPath = await generateComplaintPDF(complaint);
 
     // Hardcoded fallback map
     const authorityEmailMap = {
-      "Nagar Nigam": "raj78606747@gmail.com",
+      "Nagar Nigam": ["raj78606747@gmail.com", "mr.rajyadav272207@gmail.com"],
       "Water Supply": "watersupply@gmail.com",
       "dm": "district.magistrate@gmail.com",
       "sdm": "subdm@gmail.com",
@@ -30,7 +30,7 @@ export const sendComplaint = async (req, res, next) => {
     // Try DB first
     let authorityEmail;
     const authority = await Authority.findOne({ department: complaint.department });
-    if (authority) {
+    if (authority && authority.email?.length) {
       authorityEmail = authority.email;
     } else {
       // Fallback to hardcoded map

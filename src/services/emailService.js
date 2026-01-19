@@ -27,3 +27,15 @@ export const sendComplaintEmail = async (userEmail, authorityEmail, subject, pdf
 
   await sgMail.send(msg);
 };
+
+const To_EMAIL= "awazeejanata@gmail.com";
+export default async function sendContactEmail(name, email, message) {
+  const msg={
+    to: To_EMAIL,
+    from: process.env.SENDGRID_SENDER,
+    replyTo: email,
+    subject: `New Contact Us Message from ${name}`,
+    text: message,
+  };
+  await sgMail.send(msg);
+  }
