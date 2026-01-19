@@ -18,7 +18,8 @@ const app=express();
 //middleware
 app.use(cors({
     origin:["http://localhost:5173", 
-            "https://awaze-e-janata.netlify.app"],
+            "https://awaze-e-janata.netlify.app",
+        "https://awaze-e-janta.vercel.app"],
 }))
 
 app.use(express.json({limit:"3mb"}));// allow base 64 json data
