@@ -11,8 +11,8 @@ const complaintSchema = new mongoose.Schema({
   department: String,
   address: String,
   location: {
-    lat: Number,
-    lng: Number
+    lat: {type:Number},
+    lng:{type: Number}
   },
 
   createdAt: { type: Date, default: Date.now },

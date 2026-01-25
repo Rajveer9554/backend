@@ -4,6 +4,32 @@ import Authority from "../models/Authority.js";
 import { generateComplaintPDF } from "../services/pdfService.js";
 import { sendComplaintEmail } from "../services/emailService.js";
 
+// Helper function: Lucknow radius check
+function isWithinLucknow(lat, lng) {
+  const lucknowLat = 26.8467;
+  const lucknowLng = 80.9462;
+  const radiusKm = 25; // approx Lucknow city radius
+
+  const toRad = (val) => (val * Math.PI) / 180;
+  const R = 6371; // Earth radius in km
+
+  const dLat = toRad(lat - lucknowLat);
+  const dLng = toRad(lng - lucknowLng);
+
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lucknowLat)) *
+      Math.cos(toRad(lat)) *
+      Math.sin(dLng / 2) ** 2;
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const distance = R * c;
+
+  return distance <= radiusKm;
+}
+// Controller: Send Complaint
+
+
 export const sendComplaint = async (req, res, next) => { 
   try {
     // Ensure userId is stored as ObjectId
