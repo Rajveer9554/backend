@@ -32,7 +32,7 @@ const To_EMAIL= "awazeejanata@gmail.com";
 export default async function sendContactEmail(name, email, message) {
   const msg={
     to: To_EMAIL,
-    from:`"Awaze-E-Janata" process.env.SENDGRID_SENDER`,
+    from: { email: process.env.SENDGRID_SENDER, name: "Awaze-E-Janata" },
     replyTo: email,
     subject: `New Contact Us Message from ${name}`,
     text: message,
