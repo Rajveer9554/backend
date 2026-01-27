@@ -32,6 +32,18 @@ function isWithinLucknow(lat, lng) {
 
 export const sendComplaint = async (req, res, next) => { 
   try {
+    const { location } = req.body;
+
+    // ✅ Location required check
+    if (!location || !location.lat || !location.lng) {
+      return res.status(400).json({ success: false, message: "Location required" });
+    }
+
+    // ✅ Lucknow radius check
+    if (!isWithinLucknow(location.lat, location.lng)) {
+      return res.status(403).json({ success: false, message: "Complaints allowed only from Lucknow region" });
+    }
+
     // Ensure userId is stored as ObjectId
     const complaint = await Complaint.create({
       ...req.body,
