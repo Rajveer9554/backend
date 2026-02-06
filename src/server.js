@@ -6,6 +6,8 @@ import otpRouter from "./routes/otp.routes.js";
 import complaintRoutes from "./routes/complaintRoutes.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import contactrouter from "./routes/contact.Routes.js";
+import authRoutes from "./routes/auth.Routes.js";
+import adminRoutes from "./routes/admin.Routes.js";
 
 import cors from"cors";
 import statsRouter from "./routes/stats.routes.js";
@@ -15,6 +17,10 @@ dotenv.config({ path: "./.env" });
 // expres to get app
 
 const app=express();
+app.use((req, res, next) => {
+  console.log("🔥 HIT:", req.method, req.url);
+  next();
+});
 //middleware
 app.use(cors({
     origin:["http://localhost:5173", 
@@ -30,8 +36,12 @@ app.use("/api", userRouter);
 app.use("/api/otp", otpRouter);
 app.use("/api/complaints",complaintRoutes);
 app.use("/api",statsRouter);
-app.use(errorHandler);
+
 app.use("/api",contactrouter);
+app.use("/api/admin", authRoutes);
+app.use("/api/admin", adminRoutes);
+app.use(errorHandler);
+
 
 
 

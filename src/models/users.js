@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 // creating schema
 
 const userSchema = new mongoose.Schema({
+  
   username: {
     type: String,
     required: [true, "Name is required !"],
@@ -62,6 +63,13 @@ const userSchema = new mongoose.Schema({
   createdDate: {
     type: Date,
     default: Date.now,
+  },
+  
+  // ✅ ADD THIS
+  role: {
+    type: String,
+    enum: ["user", "admin"],
+    default: "user",
   },
 
   // verification
