@@ -8,6 +8,7 @@ import { errorHandler } from "./middleware/errorHandler.js";
 import contactrouter from "./routes/contact.Routes.js";
 import authRoutes from "./routes/auth.Routes.js";
 import adminRoutes from "./routes/admin.Routes.js";
+import chatRoutes from "./routes/chat.Routes.js";
 
 import cors from"cors";
 import statsRouter from "./routes/stats.routes.js";
@@ -40,6 +41,7 @@ app.use("/api",statsRouter);
 app.use("/api",contactrouter);
 app.use("/api/admin", authRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/chat",  chatRoutes);
 app.use(errorHandler);
 
 
