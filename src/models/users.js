@@ -18,6 +18,8 @@ const userSchema = new mongoose.Schema({
   email: {
     type: String,
     required: [true, "Email is required !"],
+    unique: true,
+    index: true,
     match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Invalid Email [abc@gmail.com]!!"],
   },
   password: {
@@ -45,7 +47,7 @@ const userSchema = new mongoose.Schema({
   },
   mobile: {
     type: String,
-    
+    index: true,
     minLength: [10, "Mobile number must be 10 digit !"],
     maxLength: [10, "Mobile number must be 10 digit !"],
   },

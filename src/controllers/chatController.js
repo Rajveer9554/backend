@@ -1,105 +1,115 @@
-import { askAI } from "../services/geminiService.js";
+// chatHandler
 
-export const chatHandler = async (req, res) => {
-  try {
-    const { message } = req.body;
+import {askAI} from "../services/geminiService.js"
+import { detectGreeting, detectDateQuery,detectLanguage, detectApplicationRequest,detectDepartment } from "../utils/aichatdetector.js"
 
-    if (!message || typeof message !== "string") {
-      return res.status(400).json({ message: "Message is required" });
+export default async function chatHandler(req, resp) {
+
+  try{
+    // message checking 
+    const {message}=req.body;
+    if(!message || typeof message !== "string"){
+      return resp.status(400).json({reply: "Message is required "})
     }
 
-    const today = new Date().toLocaleDateString("en-IN", {
-      weekday: "long",
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
+    // greeting message✅
 
-    const talking=[
-        "hello",
-        "hi",
-        "how are you",
-        "kaise ho",
-        "kya haal hai",
-        "kya chal raha hai",
-        "what's up",
-        "sup",
-        "how's it going",
-    ]
+    if(detectGreeting(message)){
+      return resp.json({
+        reply: "Hello 🙋‍♂️ I am Awaze-E-Janata AI assistant. How may I help you, regarding complaints"
+      })
+    }
+    // Data query ✅
+    if(detectDateQuery(message)){
+      const today = new Date().toLocaleDateString("en-IN", {
+        weekday:"long",
+        day:"numeric",
+        months:"long",
+        year:"numeric"
 
-    const projectKeywords = [
-      "complaint",
-      "application",
-      "authority",
-      "dashboard",
-      "admin",
-      "schema",
-      "jwt",
-      "awaz-e-janata",
-      "mongoose",
-      "backend",
-    ];
-
-    const isDateQuery =
-      message.toLowerCase().includes("date") ||
-      message.toLowerCase().includes("aaj");
-
-    const isProjectQuery = projectKeywords.some((kw) =>
-      message.toLowerCase().includes(kw)
-    );
-    const isTalking = talking.some((greet) =>
-      message.toLowerCase().includes(greet)
-    );
-
-    let finalPrompt;
-
-    // ✅ 1. Date questions → direct factual answer
-    if (isDateQuery) {
-      return res.json({
-        reply: `Hello, Aaj ki date ${today} hai.`,
       });
+      const lang= detectLanguage(message);
+      if(lang=="English"){
+        return resp.json({reply:`Today's date is ${today}.` });
+
+      } else{
+        return resp.json({reply:`Aaj ki date: ${today}`});
+      }
     }
-        // ✅ 2. Talking greetings → direct friendly response
-    else if(isTalking){
-        return res.json({
-            reply:"Hello! Kaise ho? Main aapki madad ke liye yahan hoon. 😊"
-        })
-    }
 
-    // ✅ 2. Project-related queries (NO date in visible output)
-    if (isProjectQuery) {
-      finalPrompt = `
-You are an AI assistant helping with a software project.
+    // Application wrritiung
+    // ✅ Application Writing
+    if (detectApplicationRequest(message)) {
+      const department = detectDepartment(message) || "Concerned Authority";
+const lang = detectLanguage(message);
 
-Explain the following topic in HINGLISH.
-IMPORTANT FORMAT RULES:
-- Write the answer ONLY in numbered points (1, 2, 3...).
-- EACH numbered point must be on a NEW LINE.
-- Leave ONE BLANK LINE after every point.
-- Do NOT write multiple points in one line.
-- Do NOT use bullet points or paragraphs.
-- Output must look like exam / notes format.
+const prompt = `
+You are an AI assistant for a public complaint platform called "Awaze-e-Janata".
 
-Topic:
+Write a FORMAL complaint application in ${lang}.
+
+VERY IMPORTANT FORMATTING RULES:
+- Each section must be on a NEW LINE.
+- Leave ONE BLANK LINE between each section.
+- Do NOT merge everything in one paragraph.
+- Follow the exact format strictly.
+
+FORMAT:
+
+To,
+The Officer
+${department}
+
+Subject: [Short complaint subject]
+
+Respected Sir/Madam,
+
+[Write the complaint in 2 short paragraphs based on the user's problem.]
+
+Therefore, I kindly request you to take necessary action as soon as possible.
+
+Thank you.
+
+Yours sincerely,
+[Applicant Name]
+[Address]
+[Contact Number]
+[Date]
+
+User problem:
 ${message}
 `;
-    }
-    // ✅ 3. Non-project → Hindi motivational shayari
-    else {
-      finalPrompt = `
-User message:
-${message}
 
-Reply with a short motivational shayari in Hindi only with some emoji and love sign.
-No explanations.
+
+      const reply = await askAI(prompt);
+      return resp.json({ reply });
+    }
+
+    // ✅ Department Query (without application request)
+    const department = detectDepartment(message);
+    if (department) {
+      const prompt = `
+User problem: ${message}
+
+Explain in Hinglish which department (${department}) is responsible.
+Give answer in 3 short numbered points.
 `;
+      const reply = await askAI(prompt);
+      return resp.json({ reply });
     }
 
-    const reply = await askAI(finalPrompt);
-    return res.status(200).json({ reply });
+    // ✅ General Question → AI Answer
+    const prompt = `
+You are Awaze-e-Janata AI assistant.
+User asked: ${message}
+
+Give a clear, short answer in Hinglish.
+`;
+    const reply = await askAI(prompt);
+    return resp.json({ reply });
 
   } catch (err) {
-    console.error("❌ Backend Error:", err);
-    return res.status(500).json({ message: "Internal server error" });
+    console.error("Backend Error:", err);
+    return resp.status(500).json({ reply: "Internal Server error" });
   }
-};
+}

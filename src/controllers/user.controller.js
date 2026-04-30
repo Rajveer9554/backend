@@ -102,11 +102,11 @@ export const getProfile = async (req, res) => {
 
 export const updateProfile = async (req, res) => {
   try {
-    const { username, email, mobile, address, image,age,gender } = req.body;
+    const { username, email, mobile, address,age,gender } = req.body;
 
     const updatedUser = await User.findByIdAndUpdate(
       req.user.userId,
-      { username, email, mobile, address, image,age,gender },
+      { username, email, mobile, address, age,gender },
       { new: true, runValidators: true }
     ).select("-password -__v");
 
