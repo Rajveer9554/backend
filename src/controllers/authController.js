@@ -2,35 +2,45 @@ import User from "../models/users.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-// ✅ Admin Login
 export const adminLogin = async (req, res) => {
-  const { email, password } = req.body;
-
-  console.log(email, password);
-
   try {
-    let superAdmins = process.env.SUPER_ADMIN_USER;
-    const superAdminPassword = process.env.SUPER_ADMIN_PASSWORD;
+    const { email, password } = req.body;
 
-    superAdmins = superAdmins.split(",");
+    // ✅ Basic validation
+    if (!email || !password) {
+      return res.status(400).json({ msg: "Email and Password required" });
+    }
 
-    const isSuperAdmin = superAdmins.find(
-      (adminEmail) => adminEmail.trim() === email
-    );
+    console.log("Login Attempt:", email, password);
 
-    // Super Admin Login
+    // ✅ ENV safe handling
+    const superAdminsEnv = process.env.SUPER_ADMIN_USER || "";
+    const superAdminPassword = process.env.SUPER_ADMIN_PASSWORD || "";
+
+    const superAdmins = superAdminsEnv.split(",").map(e => e.trim());
+
+    const isSuperAdmin = superAdmins.includes(email.trim());
+
+    // =========================
+    // ✅ SUPER ADMIN LOGIN
+    // =========================
     if (isSuperAdmin) {
       console.log("Super Admin Matched Here");
 
-      if (password === superAdminPassword) {
-        console.log("Password matched")
+      // ✅ Trim comparison (fixes your issue)
+      if (password.trim() === superAdminPassword.trim()) {
+        console.log("Super Admin Password matched");
+
         const token = jwt.sign(
           { email: email, role: "superAdmin" },
           process.env.JWT_SECRET,
           { expiresIn: "1d" }
         );
 
-        return res.json({ token, userType:"superAdmin" });
+        return res.status(200).json({
+          token,
+          userType: "superAdmin",
+        });
       } else {
         return res.status(400).json({
           msg: "Invalid Super Admin Password",
@@ -38,7 +48,9 @@ export const adminLogin = async (req, res) => {
       }
     }
 
-    // Normal Admin Login
+    // =========================
+    // ✅ NORMAL ADMIN LOGIN
+    // =========================
     const user = await User.findOne({ email, role: "admin" });
 
     if (!user) {
@@ -57,10 +69,16 @@ export const adminLogin = async (req, res) => {
       { expiresIn: "1d" }
     );
 
-    return res.json({ token });
+    return res.status(200).json({
+      token,
+      userType: "admin",
+    });
 
   } catch (err) {
-    console.log(err, "Errrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr")
-    return res.status(500).json({ msg: "Server error", err:err });
+    console.log("Login Error:", err);
+    return res.status(500).json({
+      msg: "Server error",
+      error: err.message,
+    });
   }
 };
