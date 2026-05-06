@@ -57,11 +57,11 @@ export const sendComplaint = async (req, res, next) => {
     // Hardcoded fallback map
     const authorityEmailMap = {
       "Nagar Nigam": ["raj78606747@gmail.com", "mr.rajyadav272207@gmail.com"],
-      "Water Supply": "watersupply@gmail.com",
-      "dm": "district.magistrate@gmail.com",
-      "sdm": "subdm@gmail.com",
-      "Jal Nigam": "jal.nigam@gmail.com",
-      "Rto": "rto@gmail.com",
+      "Water Supply": "tiwariamanhr@gmail.com",
+      "dm": "rajveer786067@gmail.com",
+      "sdm": "tiwariamanhr@gmail.com",
+      "Jal Nigam": "raj78606747@gmail.com",
+      "Rto": "tiwariamanhr@gmail.com",
       "Electricity Board": "electricity.board@gmail.com"
     };
 
